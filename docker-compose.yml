@@ -1,0 +1,41 @@
+version: '3.8'
+services:
+  zookeeper:
+      container_name: zookeeper
+      image: wurstmeister/zookeeper
+      ports:
+        - 2181:2181
+
+  kafka:
+    container_name: kafka
+    image: wurstmeister/kafka
+    ports:
+      - 9092:9092
+    volumes:
+      - ./data/kafka:/var/run/docker.sock
+    environment:
+      - KAFKA_ADVERTISED_HOST_NAME=kafka
+      - KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181
+
+  app1:
+    container_name: app1
+    build: ./app1
+    ports:
+      - 8080:8080
+    volumes:
+      - ./app1:/app
+    depends_on:
+      - kafka
+
+  app2:
+    container_name: app2
+    build: ./app2
+    ports:
+      - 8081:8080
+    volumes:
+      - ./app2:/app
+    depends_on:
+      - kafka
+
+
+
